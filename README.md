@@ -1,5 +1,5 @@
 # QqMusic
-QqMusic songs synchronization for IOS using iFile web server. The project is built using netcoreapp2.0. It requires QqMusic v6.x and a web server (e.g. iFile) on app's document folder.
+QqMusic songs synchronization for IOS. It requires QqMusic <b>v6.x</b> and a web server (e.g. iFile) on app's document folder. It syncs all songs downloaded/cached in QqMusic app from IOS device into local hdd or network location (e.g. NAS via SMB protocol).
 
 # Settings - appsettings.json
 ```json
@@ -12,5 +12,5 @@ QqMusic songs synchronization for IOS using iFile web server. The project is bui
 * BaseUrl: the remote url of QqMusic IOS app's document folder.
 
 # Usage:
-* Bootup the server using <b>dotnet QqMusic.dll</b>
+* Bootup the server using <b>dotnet QqMusic.dll</b> (require .net core 2.0)
 * Hit url: <b>http://server.ip:5005/api/sync</b>
