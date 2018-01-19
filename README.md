@@ -1,5 +1,5 @@
 # QqMusic
-QqMusic songs synchronization for IOS. It requires QqMusic <b>v6.x</b> and a web server (e.g. iFile) on app's document folder. It syncs all songs downloaded/cached in QqMusic app from IOS device into local hdd or network location (e.g. NAS via SMB protocol).
+QqMusic songs synchronization for IOS. It requires QqMusic <b>v6.x</b> and a web server (e.g. iFile) on app's document folder. It syncs all songs downloaded/cached in QqMusic app from IOS device into local hdd or network location (e.g. NAS via SMB protocol). It renames synced songs to <b>[singer] - [song].[extension]</b>.
 
 # Settings - appsettings.json
 ```json
@@ -14,3 +14,4 @@ QqMusic songs synchronization for IOS. It requires QqMusic <b>v6.x</b> and a web
 # Usage:
 * Bootup the server using <b>dotnet QqMusic.dll</b> (require .net core 2.0)
 * Hit url: <b>http://server.ip:5005/api/sync</b>
+
