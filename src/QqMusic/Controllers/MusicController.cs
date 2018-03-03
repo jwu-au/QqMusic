@@ -145,7 +145,7 @@ namespace QqMusic.Controllers
                         output.AppendLine($"uploading {songFileName}");
                         using (var fileStream = System.IO.File.OpenRead(downloadedSong))
                         {
-                            await webDavClient.PutFile($"Downloads/songs/{songFileName}", fileStream).ConfigureAwait(false);
+                            await webDavClient.PutFile(WebUtility.UrlEncode($"Downloads/songs/{songFileName}"), fileStream).ConfigureAwait(false);
                         }
                     }
                 }
