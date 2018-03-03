@@ -2,12 +2,14 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Flurl.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using WebDav;
 
 namespace QqMusic.Controllers
 {
@@ -119,12 +121,51 @@ namespace QqMusic.Controllers
             return output.ToString();
         }
 
+        [HttpGet("upload")]
+        public async Task<string> Upload()
+        {
+            var clientParams = new WebDavClientParams {BaseAddress = new Uri(_options.UploadBaseUrl)};
+            using (var webDavClient = new WebDavClient(clientParams))
+            {
+                var songResponse = await webDavClient.Propfind("Downloads/songs").ConfigureAwait(false);
+                if (!songResponse.IsSuccessful) return "upload propfind failed";
+
+                var output = new StringBuilder();
+
+                var existingSongs = songResponse.Resources.Select(x => Path.GetFileName(WebUtility.UrlDecode(x.Uri))).Where(x => !string.IsNullOrEmpty(x)).ToList();
+                var downloadPath = Path.Combine(_options.BasePath, "songs");
+                var downloadedSongs = Directory.GetFiles(downloadPath);
+                foreach (var downloadedSong in downloadedSongs)
+                {
+                    var songFileName = Path.GetFileName(downloadedSong);
+                    if (!existingSongs.Contains(songFileName))
+                    {
+                        // upload
+                        _logger.LogInformation("uploading {0}", songFileName);
+                        output.AppendLine($"uploading {songFileName}");
+                        using (var fileStream = System.IO.File.OpenRead(downloadedSong))
+                        {
+                            await webDavClient.PutFile($"Downloads/songs/{songFileName}", fileStream).ConfigureAwait(false);
+                        }
+                    }
+                }
+
+                if (output.Length == 0)
+                {
+                    output.AppendLine("uploaded none");
+                }
+
+                return output.ToString();
+            }
+        }
+
         [HttpGet("sync")]
         public async Task<string> Sync()
         {
             var output = new StringBuilder();
             output.AppendLine(await Renew());
             output.AppendLine(await Download());
+            output.AppendLine(await Upload());
             output.AppendLine(DateTime.Now.ToString(CultureInfo.InvariantCulture));
             return output.ToString();
         }
