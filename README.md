@@ -29,3 +29,4 @@ QqMusic songs synchronization for IOS. It requires QqMusic <b>v6.x</b> and a web
 * Run: QqMusic.exe install: will install a windows service named QqMusic
 * Run: QqMusic.exe start: to start the service
 * For removing the service run: QqMusic.exe stop, and QqMusic.exe uninstall
+* Set the windows service run using a particular account to avoid any permission issue

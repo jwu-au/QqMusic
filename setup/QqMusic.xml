@@ -4,5 +4,5 @@
   <description>QqMusic Sync for IOS by Jing Wu</description>
   <executable>dotnet</executable>
   <arguments>QqMusic.dll</arguments>
-  <logpath>.\logs</logpath>
+  <logpath>D:\services\QqMusic\logs</logpath>
 </service>
