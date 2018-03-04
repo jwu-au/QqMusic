@@ -3,7 +3,7 @@ QqMusic songs synchronization for IOS. It requires QqMusic <b>v6.x</b> and a web
 
 
 # Settings - appsettings.json
-```json
+```
   "Music": {
     "ServerUrl": "http://192.168.9.139:10000/var/mobile/Applications/F16E8B42-BA8F-4E78-8CA4-E5C20C42EEEE/Documents", // QqMusic app url (via iFile)
     "DownloadBasePath": "\\\\192.168.9.8\\media\\QqMusic", // local base path for storing downloaded song db file
