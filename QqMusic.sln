@@ -1,9 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+VisualStudioVersion = 15.0.27130.2024
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QqMusic", "src\QqMusic\QqMusic.csproj", "{6F335326-726C-443D-850B-805D94CEE18C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Setup", "Setup", "{EFF78510-CBDC-459F-9405-AD25519523FB}"
+	ProjectSection(SolutionItems) = preProject
+		setup\QqMusic.exe = setup\QqMusic.exe
+		setup\QqMusic.xml = setup\QqMusic.xml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

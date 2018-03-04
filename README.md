@@ -23,3 +23,9 @@ QqMusic songs synchronization for IOS. It requires QqMusic <b>v6.x</b> and a web
 * Bootup the server using <b>dotnet QqMusic.dll</b> (require .net core 2.0)
 * Hit url: <b>http://server.ip:5005/api/sync</b>
 
+
+# Install as windows service:
+* Copy QqMusic.exe and QqMusic.xml to a folder
+* Run: QqMusic.exe install: will install a windows service named QqMusic
+* Run: QqMusic.exe start: to start the service
+* For removing the service run: QqMusic.exe stop, and QqMusic.exe uninstall

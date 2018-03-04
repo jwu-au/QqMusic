@@ -1,0 +1,8 @@
+<service>
+  <id>QqMusic</id>
+  <name>QqMusic</name>
+  <description>QqMusic Sync for IOS by Jing Wu</description>
+  <executable>dotnet</executable>
+  <arguments>QqMusic.dll</arguments>
+  <logpath>.\logs</logpath>
+</service>
