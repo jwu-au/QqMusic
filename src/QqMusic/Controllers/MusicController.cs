@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Flurl.Http;
@@ -118,6 +117,11 @@ namespace QqMusic.Controllers
                 }
             }
 
+            if (output.Length == 0)
+            {
+                output.AppendLine("downloaded none");
+            }
+
             return output.ToString();
         }
 
@@ -127,26 +131,26 @@ namespace QqMusic.Controllers
             var clientParams = new WebDavClientParams {BaseAddress = new Uri(_options.UploadBaseUrl)};
             using (var webDavClient = new WebDavClient(clientParams))
             {
-                var songResponse = await webDavClient.Propfind("Downloads/songs").ConfigureAwait(false);
+                const string songResourcePath = "/Downloads/songs/";
+                var songResponse = await webDavClient.Propfind(songResourcePath).ConfigureAwait(false);
                 if (!songResponse.IsSuccessful) return "upload propfind failed";
 
-                var output = new StringBuilder();
-
-                var existingSongs = songResponse.Resources.Select(x => Path.GetFileName(WebUtility.UrlDecode(x.Uri))).Where(x => !string.IsNullOrEmpty(x)).ToList();
+                var existingSongs = songResponse.Resources.Select(x => new {x.Uri, FileName = Path.GetFileName(Uri.UnescapeDataString(x.Uri)).Normalize()}).Where(x => !string.IsNullOrEmpty(x.FileName)).ToList();
                 var downloadPath = Path.Combine(_options.BasePath, "songs");
                 var downloadedSongs = Directory.GetFiles(downloadPath);
+
+                var output = new StringBuilder();
                 foreach (var downloadedSong in downloadedSongs)
                 {
                     var songFileName = Path.GetFileName(downloadedSong);
-                    if (!existingSongs.Contains(songFileName))
+                    if (existingSongs.Any(x => x.FileName == songFileName)) continue;
+
+                    // upload
+                    _logger.LogInformation("uploading {0}", songFileName);
+                    output.AppendLine($"uploading {songFileName}");
+                    using (var fileStream = System.IO.File.OpenRead(downloadedSong))
                     {
-                        // upload
-                        _logger.LogInformation("uploading {0}", songFileName);
-                        output.AppendLine($"uploading {songFileName}");
-                        using (var fileStream = System.IO.File.OpenRead(downloadedSong))
-                        {
-                            await webDavClient.PutFile(WebUtility.UrlEncode($"Downloads/songs/{songFileName}"), fileStream).ConfigureAwait(false);
-                        }
+                        await webDavClient.PutFile($"Downloads/songs/{Uri.EscapeDataString(songFileName)}", fileStream).ConfigureAwait(false);
                     }
                 }
 
