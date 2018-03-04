@@ -50,6 +50,8 @@ namespace QqMusic.Controllers
         [HttpGet("download")]
         public async Task<string> Download()
         {
+            if (string.IsNullOrEmpty(_options.DownloadBasePath)) return "skipped download\r\n";
+
             var output = new StringBuilder();
 
             using (var dbContext = new QqmusicContext())
@@ -62,7 +64,7 @@ namespace QqMusic.Controllers
 
                 if (songs.Any())
                 {
-                    var songsPath = Path.Combine(_options.DownloadBasePath, "songs");
+                    var songsPath = Path.Combine(_options.DownloadBasePath, _options.DownloadSongPath);
                     if (!Directory.Exists(songsPath)) Directory.CreateDirectory(songsPath);
                 }
 
@@ -128,6 +130,8 @@ namespace QqMusic.Controllers
         [HttpGet("upload")]
         public async Task<string> Upload()
         {
+            if (string.IsNullOrEmpty(_options.UploadBaseUrl)) return "skipped upload\r\n";
+
             var clientParams = new WebDavClientParams {BaseAddress = new Uri(_options.UploadBaseUrl)};
             using (var webDavClient = new WebDavClient(clientParams))
             {
