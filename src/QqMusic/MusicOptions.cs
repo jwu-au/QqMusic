@@ -2,8 +2,10 @@
 {
     public class MusicOptions
     {
-        public string BasePath { get; set; }
-        public string BaseUrl { get; set; }
+        public string ServerUrl { get; set; }
+        public string DownloadBasePath { get; set; }
+        public string DownloadSongPath { get; set; }
         public string UploadBaseUrl { get; set; }
+        public string UploadSongUrl { get; set; }
     }
 }

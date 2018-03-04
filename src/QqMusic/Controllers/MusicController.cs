@@ -27,11 +27,11 @@ namespace QqMusic.Controllers
         [HttpGet("renew")]
         public async Task<string> Renew()
         {
-            if (!Directory.Exists(_options.BasePath)) Directory.CreateDirectory(_options.BasePath);
-            var dbFile = Path.Combine(_options.BasePath, "db.sqlite");
+            if (!Directory.Exists(_options.DownloadBasePath)) Directory.CreateDirectory(_options.DownloadBasePath);
+            var dbFile = Path.Combine(_options.DownloadBasePath, "db.sqlite");
             if (System.IO.File.Exists(dbFile)) System.IO.File.Delete(dbFile);
 
-            var dbUrl = $"{_options.BaseUrl}/qqmusic.sqlite";
+            var dbUrl = $"{_options.ServerUrl}/qqmusic.sqlite";
             using (var dbStream = await dbUrl.GetStreamAsync().ConfigureAwait(false))
             using (var fileStream = System.IO.File.Create(dbFile))
             {
@@ -44,7 +44,7 @@ namespace QqMusic.Controllers
             System.IO.File.Copy(dbFile, localDbFile, true);
             _logger.LogInformation("copied db file to {0}", localDbFile);
 
-            return $"renewed db file in {dbFile}";
+            return $"renewed db file in {dbFile}\r\n";
         }
 
         [HttpGet("download")]
@@ -62,7 +62,7 @@ namespace QqMusic.Controllers
 
                 if (songs.Any())
                 {
-                    var songsPath = Path.Combine(_options.BasePath, "songs");
+                    var songsPath = Path.Combine(_options.DownloadBasePath, "songs");
                     if (!Directory.Exists(songsPath)) Directory.CreateDirectory(songsPath);
                 }
 
@@ -73,14 +73,14 @@ namespace QqMusic.Controllers
                     if (ext.Contains("tm")) ext = ".mp3"; // mp3 extensions: tm0, tm3
                     var fileName = $"{song.Singer} - {song.Name}{ext}";
                     fileName = string.Join("_", fileName.Split(Path.GetInvalidFileNameChars()));
-                    fileName = Path.Combine(_options.BasePath, "songs", fileName);
+                    fileName = Path.Combine(_options.DownloadBasePath, _options.DownloadSongPath, fileName);
                     if (System.IO.File.Exists(fileName))
                     {
                         _logger.LogInformation("skipping {0}", fileName);
                         continue;
                     }
 
-                    var fullUrl = $"{_options.BaseUrl}{song.File}";
+                    var fullUrl = $"{_options.ServerUrl}{song.File}";
                     _logger.LogInformation("downloading {0}", fullUrl);
                     using (var flurlClient = new FlurlClient(fullUrl))
                     {
@@ -131,12 +131,11 @@ namespace QqMusic.Controllers
             var clientParams = new WebDavClientParams {BaseAddress = new Uri(_options.UploadBaseUrl)};
             using (var webDavClient = new WebDavClient(clientParams))
             {
-                const string songResourcePath = "/Downloads/songs/";
-                var songResponse = await webDavClient.Propfind(songResourcePath).ConfigureAwait(false);
-                if (!songResponse.IsSuccessful) return "upload propfind failed";
+                var songResponse = await webDavClient.Propfind(_options.UploadSongUrl).ConfigureAwait(false);
+                if (!songResponse.IsSuccessful) return "upload propfind failed\r\n";
 
                 var existingSongs = songResponse.Resources.Select(x => new {x.Uri, FileName = Path.GetFileName(Uri.UnescapeDataString(x.Uri)).Normalize()}).Where(x => !string.IsNullOrEmpty(x.FileName)).ToList();
-                var downloadPath = Path.Combine(_options.BasePath, "songs");
+                var downloadPath = Path.Combine(_options.DownloadBasePath, _options.DownloadSongPath);
                 var downloadedSongs = Directory.GetFiles(downloadPath);
 
                 var output = new StringBuilder();
@@ -150,7 +149,7 @@ namespace QqMusic.Controllers
                     output.AppendLine($"uploading {songFileName}");
                     using (var fileStream = System.IO.File.OpenRead(downloadedSong))
                     {
-                        await webDavClient.PutFile($"Downloads/songs/{Uri.EscapeDataString(songFileName)}", fileStream).ConfigureAwait(false);
+                        await webDavClient.PutFile($"{_options.UploadSongUrl}/{Uri.EscapeDataString(songFileName)}", fileStream).ConfigureAwait(false);
                     }
                 }
 
@@ -170,7 +169,7 @@ namespace QqMusic.Controllers
             output.AppendLine(await Renew());
             output.AppendLine(await Download());
             output.AppendLine(await Upload());
-            output.AppendLine(DateTime.Now.ToString(CultureInfo.InvariantCulture));
+            output.AppendLine("all synced at: " + DateTime.Now.ToString(CultureInfo.InvariantCulture));
             return output.ToString();
         }
     }
