@@ -20,7 +20,7 @@ QqMusic songs 3-way synchronization for IOS. It requires QqMusic <b>v6.x</b> and
 
 
 # Usage:
-* Bootup the server using <b>dotnet QqMusic.dll</b> (require .net core 2.0)
+* Bootup the server using <b>dotnet QqMusic.dll</b> (require .net core 2.x)
 * Hit url: <b>http://server.ip:5005/api/sync</b>
 
 
